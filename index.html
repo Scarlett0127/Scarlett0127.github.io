@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字津门 · 天津人文门户</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: #f5f3f0;
+            color: #1e2a3a;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            border-bottom: 2px solid #dcd7cd;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #b04b2b;
+            text-shadow: 2px 2px 0 #e1d6cc;
+        }
+        .logo span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #5f6a7a;
+            letter-spacing: 2px;
+            margin-left: 0.5rem;
+        }
+
+        .nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        .nav a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #2f3e4f;
+            font-size: 1.1rem;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+            transition: 0.2s;
+        }
+        .nav a:hover {
+            border-bottom-color: #b04b2b;
+            color: #b04b2b;
+        }
+
+        .img-placeholder {
+            background-color: #d3cdc0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4a4a4a;
+            font-size: 1rem;
+            font-weight: 400;
+            border: 2px dashed #9b8e7c;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+            width: 100%;
+            padding: 0;
+            text-align: center;
+            transition: 0.2s;
+            overflow: hidden;
+        }
+
+        /* 修改：将原来的网格布局改为块级布局，让标题和轮播占一行，卡片占下一行 */
+        .hero-section {
+            margin: 3rem 0 2rem;
+        }
+
+        .hero-top {
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-top .block-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #2c3a4b;
+            line-height: 1.1;
+            letter-spacing: 6px;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            border-left: 10px solid #b04b2b;
+            padding-left: 1.5rem;
+        }
+
+        /* 轮播图容器 - 14:8 比例 (接近4:3) */
+        .hero-carousel-container {
+            width: 100%;
+            max-width: 800px;  /* 限制最大宽度，保持居中 */
+            margin: 0 auto;     /* 水平居中 */
+            aspect-ratio: 14 / 8;
+            background-color: #cdbcac;
+            border-radius: 28px 8px 28px 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .carousel {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .carousel-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-item {
+            flex: 0 0 100%;
+            height: 100%;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;  /* 保证图片覆盖整个区域，可能裁剪 */
+            display: block;
+        }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .indicator {
+            width: 30px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .indicator.active {
+            background-color: #b04b2b;
+        }
+
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .carousel-arrow:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .carousel-arrow.left {
+            left: 10px;
+        }
+
+        .carousel-arrow.right {
+            right: 10px;
+        }
+
+        /* 统计卡片 - 新一行，居中显示 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(200px, 300px));  /* 固定最小宽度，最大300px */
+            gap: 2rem;
+            justify-content: center;  /* 网格整体居中 */
+            margin: 0 auto;
+            width: fit-content;  /* 宽度适应内容 */
+        }
+        
+        .stat-card {
+            background: #fefcf7;
+            border-radius: 32px 16px 32px 16px;
+            padding: 1.6rem 0.8rem;
+            text-align: center;
+            box-shadow: 8px 8px 0 #d0b8a8;
+            border: 1px solid #e5d9d0;
+            transition: 0.15s;
+        }
+        .stat-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 12px 12px 0 #b04b2b40;
+        }
+        .stat-number {
+            font-size: 3.2rem;
+            font-weight: 800;
+            color: #b04b2b;
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 1.1rem;
+            color: #3f4d5e;
+            letter-spacing: 1px;
+            border-top: 2px dotted #cdb9a8;
+            margin-top: 0.5rem;
+            padding-top: 0.6rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #1e2f3b;
+            margin: 3rem 0 1.5rem 0;
+            position: relative;
+            display: inline-block;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 70%;
+            height: 4px;
+            background: linear-gradient(90deg, #b04b2b, #d1b8a6);
+            border-radius: 4px;
+        }
+
+        .about-text {
+            background: #fefcf4;
+            padding: 2.2rem 2.5rem;
+            border-radius: 50px 20px 50px 20px;
+            box-shadow: inset 0 2px 10px #f0e7dc, 0 10px 20px rgba(0,0,0,0.03);
+            font-size: 1.15rem;
+            text-align: justify;
+            border: 1px solid #e3d7cb;
+            color: #2b3f4e;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 2rem 0 3rem;
+        }
+        .feature-card {
+            background: #fffcf8;
+            border-radius: 32px 16px 32px 16px;
+            overflow: hidden;
+            box-shadow: 6px 6px 0 #cdbcac;
+            transition: 0.2s;
+            border: 1px solid #e1cfbf;
+        }
+        .feature-card:hover {
+            box-shadow: 10px 10px 0 #b04b2b60;
+        }
+        
+        /* 特色卡片图片容器 - 4:3比例 */
+        .feature-card .img-placeholder {
+            border-radius: 0;
+            aspect-ratio: 4 / 3;  /* 4:3比例 */
+            width: 100%;
+            background-color: #bfaea1;
+            border: none;
+            border-bottom: 4px solid #b04b2b;
+            padding: 0;
+        }
+        
+        .feature-card .img-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 1rem 1rem 0.5rem 1rem;
+            color: #2f2a24;
+        }
+        .feature-card p {
+            margin: 0 1rem 1.5rem 1rem;
+            color: #4d555e;
+            font-size: 1rem;
+        }
+
+        /* 底部网格 - 4列 */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.8rem;
+            margin: 4rem 0 2rem;
+            border-top: 3px double #b29e8a;
+            padding-top: 3rem;
+        }
+        
+        .bottom-item {
+            background: #fffcf3;
+            border-radius: 24px 10px 24px 10px;
+            padding: 1.5rem 1.2rem;
+            box-shadow: 4px 4px 0 #cbb6a5;
+            border: 1px solid #ddcdbc;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .bottom-item:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 #b04b2b80;
+        }
+
+        .bottom-item .img-placeholder {
+            display: none;
+        }
+        
+        .bottom-item h4 {
+            font-size: 1.4rem;
+            margin-bottom: 1.2rem;
+            color: #4b3621;
+            border-left: 5px solid #b04b2b;
+            padding-left: 0.8rem;
+            position: relative;
+        }
+
+        /* ===== 简约版快速链接样式 ===== */
+        .quick-links-simple {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem 1rem;
+        }
+
+        .quick-link-simple {
+            list-style: none;
+        }
+
+        .quick-link-simple a {
+            text-decoration: none;
+            color: #5d4b38;
+            font-size: 1rem;
+            padding: 0.25rem 0;
+            display: inline-block;
+            transition: color 0.2s;
+            position: relative;
+        }
+
+        .quick-link-simple a:hover {
+            color: #b04b2b;
+        }
+
+        /* 简约下划线效果 */
+        .quick-link-simple a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background-color: #b04b2b;
+            transition: width 0.2s;
+        }
+
+        .quick-link-simple a:hover::after {
+            width: 100%;
+        }
+
+        /* 联系我们简约样式 */
+        .contact-info-simple {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .contact-item-simple {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #5d4b38;
+            font-size: 0.95rem;
+        }
+
+        .contact-icon-simple {
+            color: #b04b2b;
+            font-size: 1.1rem;
+            min-width: 1.5rem;
+        }
+
+        /* 津门剧史简约样式 */
+        .drama-text-simple {
+            color: #5d4b38;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .drama-link-simple {
+            color: #b04b2b;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: gap 0.2s;
+        }
+
+        .drama-link-simple:hover {
+            gap: 0.5rem;
+            color: #8f3c22;
+        }
+
+        /* AI智能对话简约样式 */
+        .ai-block-simple {
+            background-color: #f9f2ea;
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+
+        .ai-title-simple {
+            font-weight: 600;
+            color: #b04b2b;
+            margin-bottom: 0.3rem;
+        }
+
+        .ai-desc-simple {
+            font-size: 0.85rem;
+            color: #6b5a4b;
+        }
+
+        .footer {
+            text-align: center;
+            margin: 3rem 0 1.5rem;
+            padding: 2rem 0 0.5rem;
+            border-top: 1px solid #cdbcab;
+            color: #5f6b78;
+            font-size: 0.95rem;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1024px) {
+            .stats-grid { 
+                grid-template-columns: repeat(3, 1fr); 
+                max-width: 800px;
+            }
+            .bottom-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 720px) {
+            .features-grid { grid-template-columns: 1fr; }
+            .stats-grid { 
+                grid-template-columns: 1fr; 
+                gap: 1rem;
+            }
+            .nav ul { gap: 1rem; }
+            .bottom-grid { grid-template-columns: 1fr; }
+            .hero-top .block-title { font-size: 2.8rem; }
+        }
+        
+        @media (max-width: 480px) {
+            .bottom-grid { grid-template-columns: 1fr; }
+            .hero-top .block-title { font-size: 2.2rem; }
+            .hero-carousel-container {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">数字津门 <span>· 故里寻踪</span></div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="#">首页</a></li>
+                    <li><a href="#">津门剧史</a></li>
+                    <li><a href="#">津人物志</a></li>
+                    <li><a href="#">史的造物</a></li>
+                    <li><a href="#">商城</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- 重新组织结构：标题和轮播在上，卡片在下 -->
+        <div class="hero-section">
+            <div class="hero-top">
+                <div class="block-title">九河下梢</div>
+                
+                <!-- ========== 图片位置 1：桂顺斋轮播图 - 三张照片轮换 ========== -->
+                <!-- 请将下面三个 img 的 src 替换为你的网络图片地址 -->
+                <div class="hero-carousel-container">
+                    <div class="carousel" id="carousel">
+                        <div class="carousel-inner" id="carouselInner">
+                            <!-- 第一张照片：桂顺斋图片1 -->
+                            <div class="carousel-item">
+                                <!-- 👇 替换这里的 src 为你的第一张网络图片地址 -->
+                                <img src="https://i.imgs.ovh/2026/03/04/OOVinn.jpeg" alt="OOVinn.jpeg" border="0">
+                            </div>
+                            <!-- 第二张照片：桂顺斋图片2 -->
+                            <div class="carousel-item">
+                                <!-- 👇 替换这里的 src 为你的第二张网络图片地址 -->
+                               <img src="https://i.imgs.ovh/2026/03/04/OObU9N.jpeg" alt="OObU9N.jpeg" border="0">
+                            </div>
+                            <!-- 第三张照片：桂顺斋图片3（新增） -->
+                            <div class="carousel-item">
+                                <!-- 👇 替换这里的 src 为你的第三张网络图片地址 -->
+                                <img src="https://i.imgs.ovh/2026/03/04/OObREQ.jpeg" alt="OObREQ.jpeg" border="0">
+                                <!-- 示例：https://example.com/guishunzhai3.jpg -->
+                            </div>
+                        </div>
+                        
+                        <!-- 左右箭头 -->
+                        <div class="carousel-arrow left" onclick="prevSlide()">❮</div>
+                        <div class="carousel-arrow right" onclick="nextSlide()">❯</div>
+                        
+                        <!-- 指示器 - 现在有三个点 -->
+                        <div class="carousel-indicators" id="indicators">
+                            <div class="indicator active" onclick="goToSlide(0)"></div>
+                            <div class="indicator" onclick="goToSlide(1)"></div>
+                            <div class="indicator" onclick="goToSlide(2)"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ========== 图片位置1结束 ========== -->
+            </div>
+
+            <!-- 统计卡片 - 独立一行，居中显示 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">1404</div>
+                    <div class="stat-label">成立 · 建城之年</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">600<small style="font-size:1.4rem;">年+</small></div>
+                    <div class="stat-label">历史遗存 · 风貌建筑</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">1364<small style="font-size:1.4rem;">万</small></div>
+                    <div class="stat-label">常驻人口 · 生机津门</div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">关于天津</h2>
+        <div class="about-text">
+            <p>天津是中国近代的重要缩影。1860年第二次鸦片战争后，城市从传统漕运枢纽转向近代通商口岸。1900年义和团运动在此爆发，天津成为抗击八国联军的前线。之后《辛丑条约》签订，天津被迫拆除城墙，禁止驻军，蒙受屈辱。清末新政时期，天津率先兴办实业、新式学堂与巡警制度，成为北方近代化先锋。这一时期，众多政客、文人寓居于此，文化与思想活跃。1919年五四运动中，天津积极响应，周恩来等革命先驱在此开展爱国运动。1937年抗战爆发后天津沦陷，人民坚持地下抗日斗争。1949年1月，天津解放，近代百年的屈辱与动荡，迎来城市新生。</p>
+        </div>
+
+        <h2 class="section-title">天津特色</h2>
+        <div class="features-grid">
+            <!-- ========== 图片位置 2：美食之都 - 4:3比例 ========== -->
+            <div class="feature-card">
+                <div class="img-placeholder">
+                    <!-- 👇 替换这里的 src 为美食相关图片地址（狗不理、煎饼馃子等） -->
+                    <img src="https://i.imgs.ovh/2026/03/04/OOzCHm.jpeg" alt="OOzCHm.jpeg" border="0">
+                    <!-- 示例：https://example.com/tianjin-food.jpg -->
+                </div>
+                <h3>丰富的美食之都</h3>
+                <p>狗不理 · 十八街麻花 · 耳朵眼炸糕 · 煎饼馃子 · 老豆腐</p>
+            </div>
+            <!-- ========== 图片位置 2结束 ========== -->
+            
+            <!-- ========== 图片位置 3：悠久历史 - 4:3比例 ========== -->
+            <div class="feature-card">
+                <div class="img-placeholder">
+                    <!-- 👇 替换这里的 src 为历史相关图片地址（鼓楼、古文化街等） -->
+                    <img src="https://i.imgs.ovh/2026/03/04/OOzfcO.jpeg" alt="OOzfcO.jpeg" border="0">
+                    <!-- 示例：https://example.com/tianjin-history.jpg -->
+                </div>
+                <h3>悠久的历史</h3>
+                <p>1404年设卫筑城 · 六百年风云 · 近代工业发源地之一</p>
+            </div>
+            <!-- ========== 图片位置 3结束 ========== -->
+            
+            <!-- ========== 图片位置 4：多样建筑 - 4:3比例 ========== -->
+            <div class="feature-card">
+                <div class="img-placeholder">
+                    <!-- 👇 替换这里的 src 为建筑相关图片地址（五大道、意式风情区等） -->
+                    <img src="https://i.imgs.ovh/2026/03/04/OOzvlg.jpeg" alt="OOzvlg.jpeg" border="0">
+                    <!-- 示例：https://example.com/tianjin-architecture.jpg -->
+                </div>
+                <h3>多样的建筑</h3>
+                <p>五大道万国建筑 · 意式风情区 · 解放北路金融街</p>
+            </div>
+            <!-- ========== 图片位置 4结束 ========== -->
+        </div>
+
+        <!-- 底部网格 - 4个板块（无图片，只有文字） -->
+        <div class="bottom-grid">
+            <!-- 快速链接 - 简约两列布局 -->
+            <div class="bottom-item">
+                <h4>快速链接</h4>
+                <ul class="quick-links-simple">
+                    <li class="quick-link-simple"><a href="#">首页</a></li>
+                    <li class="quick-link-simple"><a href="#">津门剧史</a></li>
+                    <li class="quick-link-simple"><a href="#">津人物志</a></li>
+                    <li class="quick-link-simple"><a href="#">史的造物</a></li>
+                    <li class="quick-link-simple"><a href="#">商城</a></li>
+                    <li class="quick-link-simple"><a href="#">关于我们</a></li>
+                </ul>
+            </div>
+            
+            <!-- 联系我们 - 简约风格 -->
+            <div class="bottom-item">
+                <h4>联系我们</h4>
+                <div class="contact-info-simple">
+                    <div class="contact-item-simple">
+                        <span class="contact-icon-simple">📞</span>
+                        <span>022-1234 5678</span>
+                    </div>
+                    <div class="contact-item-simple">
+                        <span class="contact-icon-simple">📧</span>
+                        <span>tianjin@digitaljinmen.cn</span>
+                    </div>
+                    <div class="contact-item-simple">
+                        <span class="contact-icon-simple">📍</span>
+                        <span>天津市和平区数字港</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 津门剧史 - 简约风格 -->
+            <div class="bottom-item">
+                <h4>津门剧史</h4>
+                <div class="drama-text-simple">
+                    戏曲 · 曲艺 · 话剧 · 文明戏<br>
+                    从稽古社到人艺 · 好戏连台
+                </div>
+                <a href="#" class="drama-link-simple">浏览剧目 →</a>
+            </div>
+            
+            <!-- AI智能对话 - 简约风格 -->
+            <div class="bottom-item">
+                <h4>AI智能对话</h4>
+                <div class="ai-block-simple">
+                    <div class="ai-title-simple">⚡ 津门百事通</div>
+                    <div class="ai-desc-simple">24h在线 · 可咨询历史、美食、路线</div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>© 2026 数字津门 · 天津城市文化数字档案</p>
+            <p style="margin-top:0.5rem;">🏮 故里门津 · 九河下梢 · 渤海明珠 🏮</p>
+        </footer>
+    </div>
+
+    <!-- 轮播交互 JavaScript - 自动适应三张图片 -->
+    <script>
+        let currentIndex = 0;
+        const slides = document.querySelectorAll('.carousel-item');
+        const indicators = document.querySelectorAll('.indicator');
+        const carouselInner = document.getElementById('carouselInner');
+        const totalSlides = slides.length;  // 现在应该是3
+
+        function updateCarousel() {
+            carouselInner.style.transform = `translateX(-${currentIndex * 100}%)`;
+            indicators.forEach((indicator, index) => {
+                if (index === currentIndex) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % totalSlides;
+            updateCarousel();
+        }
+
+        function prevSlide() {
+            currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+            updateCarousel();
+        }
+
+        function goToSlide(index) {
+            currentIndex = index;
+            updateCarousel();
+        }
+
+        // 可选：自动轮播（取消注释即可启用）
+         setInterval(nextSlide, 5000);
+    </script>
+</body>
+</html>
