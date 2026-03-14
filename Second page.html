@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>津门剧史 · 数字津门</title>
+    <style>
+        /* ===== 全局样式 (与首页保持统一) ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: #f5f3f0;
+            color: #1e2a3a;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* 导航 (完全复用首页样式) */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 2px solid #dcd7cd;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #b04b2b;
+            text-shadow: 2px 2px 0 #e1d6cc;
+        }
+        .logo span {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #5f6a7a;
+            letter-spacing: 2px;
+            margin-left: 0.5rem;
+        }
+
+        .nav ul {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        .nav a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #2f3e4f;
+            font-size: 1rem;
+            padding: 0.4rem 0;
+            border-bottom: 2px solid transparent;
+            transition: 0.2s;
+        }
+        .nav a:hover {
+            border-bottom-color: #b04b2b;
+            color: #b04b2b;
+        }
+
+        /* ===== 津门剧史专用样式 ===== */
+        .drama-hero {
+            margin-top: 1.5rem;
+            border-radius: 32px 16px 32px 16px;
+            background-color: #e8dfd3;
+            box-shadow: 8px 8px 0 #cbb6a5;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 水平滑动容器 */
+        .horizontal-scroll {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 0;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #b04b2b #e8dfd3;
+        }
+        .horizontal-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+        .horizontal-scroll::-webkit-scrollbar-thumb {
+            background-color: #b04b2b;
+            border-radius: 20px;
+        }
+        .horizontal-scroll::-webkit-scrollbar-track {
+            background-color: #e8dfd3;
+        }
+
+        /* 滑动按钮 - 基础样式 */
+        .scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 2px solid #b04b2b;
+            color: #b04b2b;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 3px 3px 0 rgba(176, 75, 43, 0.3);
+            z-index: 100;
+        }
+        .scroll-btn:hover {
+            background-color: #b04b2b;
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 5px 5px 0 rgba(176, 75, 43, 0.5);
+        }
+        .scroll-btn:active {
+            transform: translateY(-50%) translate(2px, 2px);
+            box-shadow: 2px 2px 0 rgba(176, 75, 43, 0.5);
+        }
+
+        /* 按钮位置 - 默认隐藏 */
+        .btn-left {
+            left: 1rem;
+            display: none;
+        }
+        .btn-right {
+            right: 1rem;
+            display: none;
+        }
+
+        /* 按钮显示状态 */
+        .btn-visible {
+            display: flex !important;
+        }
+
+        /* 每一屏 */
+        .scroll-panel {
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+            min-height: 500px;
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+        }
+
+        /* ===== 第一屏：照片放大作为背景板，带弹出按钮 ===== */
+        .first-panel {
+            position: relative;
+            background: linear-gradient(145deg, #fffcf8, #f7efe7);
+            overflow: hidden;
+        }
+
+        /* 背景图片容器 - 放大作为背景板 */
+        .first-panel .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .first-panel .background-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 30%;
+            display: block;
+            opacity: 0.85;
+            filter: brightness(0.9) contrast(1.1);
+        }
+
+        /* 第一屏标题 */
+        .first-panel .first-panel-title {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            font-size: 2rem;
+            font-weight: 600;
+            color: #ffffff;
+            border-left: 6px solid #b04b2b;
+            padding-left: 1rem;
+            z-index: 15;
+            background-color: rgba(176, 75, 43, 0.7);
+            backdrop-filter: blur(4px);
+            padding: 0.6rem 1.2rem 0.6rem 1.5rem;
+            border-radius: 0 30px 30px 0;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            pointer-events: none;
+        }
+
+        /* 弹出按钮 - 位于屏幕中央偏下 */
+        .first-panel .popup-button {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 90;
+            background-color: #b04b2b;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px 10px 50px 10px;
+            cursor: pointer;
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+            letter-spacing: 2px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            animation: pulse 2s infinite;
+            pointer-events: auto;
+        }
+
+        .first-panel .popup-button:hover {
+            background-color: #8f3c22;
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(176, 75, 43, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(176, 75, 43, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(176, 75, 43, 0);
+            }
+        }
+
+        /* 弹出文本框 - 默认隐藏 */
+        .first-panel .popup-text {
+            position: absolute;
+            width: 50%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background-color: rgba(255, 252, 243, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2.5rem;
+            border-radius: 40px 15px 40px 15px;
+            border-left: 8px solid #b04b2b;
+            box-shadow: 15px 15px 0 rgba(176, 75, 43, 0.3);
+            z-index: 80;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.5);
+            pointer-events: auto;
+        }
+
+        .first-panel .popup-text.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .first-panel .popup-text .intro-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2c3a4b;
+            border-left: 8px solid #b04b2b;
+            padding-left: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .first-panel .popup-text .intro-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #3f2e1f;
+            margin-bottom: 2rem;
+        }
+
+        .first-panel .popup-text .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            color: #b04b2b;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(176, 75, 43, 0.1);
+            transition: all 0.2s;
+        }
+
+        .first-panel .popup-text .close-btn:hover {
+            background-color: #b04b2b;
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .first-panel .popup-text .scroll-hint {
+            margin-top: 1rem;
+            color: #b04b2b;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .first-panel .popup-text .scroll-hint span {
+            animation: bounceRight 1.5s infinite;
+        }
+
+        /* 点击退出区域 - 覆盖整个屏幕但位于弹出框下方 */
+        .popup-exit-area {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 70;
+            display: none;
+            cursor: pointer;
+        }
+
+        .popup-exit-area.show {
+            display: block;
+        }
+
+        /* ===== 第二屏：角色画廊 - 放大图片并优化排版 ===== */
+        .character-gallery {
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+            padding: 2rem 1.5rem;
+            background: linear-gradient(145deg, #fffcf8, #f7efe7);
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .gallery-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #4b3621;
+            margin-bottom: 1.5rem;
+            border-left: 6px solid #b04b2b;
+            padding-left: 1rem;
+        }
+
+        /* 角色网格：一行两个 */
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* 角色卡片 - 正方形，放大以容纳更大图片 */
+        .character-card {
+            background: #fdf5ec;
+            border-radius: 28px 8px 28px 8px;
+            box-shadow: 5px 5px 0 #cbb6a5;
+            border: 1px solid #e2cfbf;
+            padding: 1.2rem;
+            transition: all 0.2s;
+            text-align: center;
+            cursor: default;
+            position: relative;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .character-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 8px 8px 0 #b04b2b80;
+            border-color: #b04b2b;
+        }
+
+        /* 照片占位符 - 放大以容纳图片 */
+        .character-photo {
+            width: 120px;  /* 从80px放大到120px */
+            height: 120px;
+            border-radius: 50%;
+            background-color: #d3cdc0;
+            margin: 0 auto 0.8rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #b04b2b;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .character-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;  /* 确保图片覆盖整个区域，不变形 */
+            display: block;
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #cdbcac, #b8a692);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5f4f42;
+            font-size: 1.8rem;  /* 放大字体 */
+            font-weight: bold;
+        }
+
+        .character-name {
+            font-size: 1.3rem;  /* 从1.1rem放大到1.3rem */
+            font-weight: 600;
+            color: #4b3621;
+            margin-bottom: 0.4rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* 角色简介 - 优化排版，支持多行文本 */
+        .character-bio {
+            max-height: 0;
+            opacity: 0;
+            overflow-y: auto;  /* 改为auto，如果内容过多可以滚动 */
+            transition: max-height 0.5s ease, opacity 0.3s ease;
+            background-color: #f9efe4;
+            border-radius: 16px 4px 16px 4px;
+            padding: 0 0.8rem;
+            margin-top: 0.3rem;
+            color: #5f4f42;
+            font-size: 0.85rem;  /* 稍微放大 */
+            line-height: 1.4;
+            border-left: 3px solid #b04b2b;
+            text-align: left;
+            flex: 1;
+            scrollbar-width: thin;
+            scrollbar-color: #b04b2b #f9efe4;
+        }
+
+        .character-bio::-webkit-scrollbar {
+            width: 4px;
+        }
+        .character-bio::-webkit-scrollbar-thumb {
+            background-color: #b04b2b;
+            border-radius: 4px;
+        }
+
+        .character-card:hover .character-bio {
+            max-height: 250px;  /* 增加最大高度，容纳更多文本 */
+            opacity: 1;
+            padding: 0.8rem;
+        }
+
+        /* 针对第一个人物特别优化 - 如果内容较多 */
+        .character-card:first-child .character-bio {
+            font-size: 0.8rem;  /* 稍微缩小以适应更多内容 */
+            line-height: 1.3;
+        }
+
+        .scroll-hint {
+            text-align: center;
+            margin: 0.8rem 0;
+            color: #b04b2b;
+            font-weight: 400;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            font-size: 0.9rem;
+        }
+        .scroll-hint span {
+            animation: bounceRight 1.5s infinite;
+        }
+        @keyframes bounceRight {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(6px); }
+        }
+
+        .footer {
+            text-align: center;
+            margin: 2rem 0 1rem;
+            padding: 1.5rem 0 0.5rem;
+            border-top: 1px solid #cdbcab;
+            color: #5f6b78;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1200px) {
+            .first-panel .popup-text {
+                width: 60%;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .first-panel .popup-text {
+                width: 70%;
+                padding: 2rem;
+            }
+            .first-panel .popup-text .intro-title {
+                font-size: 1.8rem;
+            }
+            .first-panel .popup-text .intro-text {
+                font-size: 1rem;
+            }
+            .character-grid {
+                max-width: 750px;
+                gap: 1.5rem;
+            }
+            .character-photo {
+                width: 100px;
+                height: 100px;
+            }
+        }
+        
+        @media (max-width: 720px) {
+            .first-panel .first-panel-title {
+                top: 1rem;
+                left: 1rem;
+                font-size: 1.4rem;
+                padding: 0.4rem 0.8rem 0.4rem 1.2rem;
+            }
+            .first-panel .popup-button {
+                font-size: 1rem;
+                padding: 0.8rem 1.5rem;
+                bottom: 10%;
+            }
+            .first-panel .popup-text {
+                width: 85%;
+                padding: 1.5rem;
+            }
+            .character-grid {
+                grid-template-columns: 1fr;
+                max-width: 350px;
+                gap: 1.2rem;
+            }
+            .character-photo {
+                width: 100px;
+                height: 100px;
+            }
+            .scroll-btn {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 点击退出区域 - 覆盖整个屏幕，点击任意位置关闭弹出框 -->
+    <div class="popup-exit-area" id="popupExitArea" onclick="closePopup()"></div>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">数字津门 <span>· 故里寻踪</span></div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="#">首页</a></li>
+                    <li><a href="#" style="color:#b04b2b; border-bottom-color:#b04b2b;">津门剧史</a></li>
+                    <li><a href="#">津人物志</a></li>
+                    <li><a href="#">史的造物</a></li>
+                    <li><a href="#">商城</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="drama-hero">
+            <!-- 左右按钮 -->
+            <div class="scroll-btn btn-left" id="btnPrev" onclick="document.getElementById('horizontalScroll').scrollBy({left: -window.innerWidth, behavior: 'smooth'})">←</div>
+            <div class="scroll-btn btn-right" id="btnNext" onclick="document.getElementById('horizontalScroll').scrollBy({left: window.innerWidth, behavior: 'smooth'})">→</div>
+
+            <div class="horizontal-scroll" id="horizontalScroll" onscroll="updateButtons()">
+                <!-- 第一屏: 照片放大作为背景板，带弹出按钮 -->
+                <div class="scroll-panel first-panel">
+                    <!-- 背景图片 -->
+                    <div class="background-image">
+                        <img src="https://i.imgs.ovh/2026/03/11/OvdOQN.jpeg" alt="津门剧史背景图" />
+                    </div>
+                    
+                    <!-- 第一屏标题 -->
+                    <div class="first-panel-title"> 津门剧史 </div>
+                    
+                    <!-- 弹出按钮 -->
+                    <button class="popup-button" onclick="openPopup()">📖 点击了解剧情</button>
+                    
+                    <!-- 弹出文本框 - 浮在背景上 -->
+                    <div class="popup-text" id="popupText">
+                        <div class="close-btn" onclick="closePopup()">×</div>
+                        <h2 class="intro-title">津门剧史 · 背景资料</h2>
+                        <div class="intro-text">
+                            <p>  1948年深冬，辽沈大捷的东北野战军挥师入关，平津战役全面铺开，国民党天津守将陈长捷依托环城碉堡、雷区、纵深工事打造的堡垒化防御体系，成为横在总攻路上的致命障碍。</p>
+                            <p>  距总攻命令仅剩最后数日，东野情报部紧急集结曾共事十余载的老情报、老工兵、老特工，于天津近郊秘密重组特遣小组，不惜一切代价，盗取天津城防堡垒化防御体系全图，为百万大军总攻扫清最后的情报盲区。</p>
+                            <p>📍 向右滑动，了解主要角色。</p>
+                        </div>
+                        <div class="scroll-hint">
+                            <span>👉 滑动浏览角色</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二屏: 八个角色 - 正方形卡片 + 放大图片 -->
+                <div class="character-gallery">
+                    <h2 class="gallery-title">🎭 津门剧史 · 角色介绍</h2>
+                    <div class="character-grid">
+                        <!-- 角色 1 - 金鉴 (已优化排版) -->
+                        <div class="character-card">
+                            <div class="character-photo">
+                                <img src="https://i.imgs.ovh/2026/03/11/OFeZyh.png" alt="金鉴">
+                            </div>
+                            <div class="character-name">金鉴</div>
+                            <div class="character-bio">
+								<strong><br></strong>
+                                <strong>公开身份：</strong>国民党工务局监工员，1947年入陆军大学乙级将官班学习。<br>
+								<strong><br></strong>
+                                <strong>专属秘密：</strong>嫉妒麦璇琨，渴望得到上司赏识。<br>
+								<strong><br></strong>
+                                <strong>关键任务：</strong>怀疑麦璇琨身份可疑，暗中调查。<br>
+								<strong><br></strong>
+                                <strong>后续：</strong>国民党败退，城防图失窃，天津解放。
+                            </div>
+                        </div>
+                        <!-- 角色 2 麦璇琨 -->
+                        <div class="character-card">
+                            <div class="character-photo">
+                                <img src="https://i.imgs.ovh/2026/03/11/OFsG7g.png" alt="OFsG7g.png" border="0">
+                            </div>
+                            <div class="character-name">麦璇琨</div>
+                            <div class="character-bio">
+                                <strong>公开身份：</strong>1946毕业于天津工商学院土木工程系、中共地下党员、隐蔽国民党天津工务局工程处、天津城防构筑委员会工程委员会、第八段工程处工程员，即现场总监工<br>
+                                <strong>专属秘密：</strong>麦璇琨的城防图并非孤本，在麦璇琨之后，另一名潜伏在公务局的党员张克诚又冒险复制了1948年底敌军增建公示的最新图纸，确保了情报的及时与准确。<br>
+                                <strong>关键任务：</strong>1948年，为配合解放军即将发起的天津战役，华北局曾公布下达了获取完整天津城防工事图。<br>
+								<strong>关键作用：</strong>这份成房土让解放军的进攻如同给“炮弹安上了眼睛”，得以精准打击军事目标，保护城市设施，仅用29小时就解放了天津。<br>
+                                <strong>后续：</strong>在解放后，长期在科技战线工作，曾担任天津市科学技术信息研究所副所长。
+
+                            </div>
+                        </div>
+                        <!-- 角色 3 王文源-->
+                        <div class="character-card">
+                            <div class="character-photo">
+                                <img src="https://i.imgs.ovh/2026/03/11/OF9VJQ.png" alt="OF9VJQ.png" border="0">
+                            </div>
+                            <div class="character-name">王文源</div>
+                            <div class="character-bio">
+                                <strong>公开身份：</strong>原名李秉文，1919出生在天津。华北局曾公布下属的中共天津地下党市委工作委员会书记，这个系统主要负责在国民党市政机关公用事业单位中发展力量。<br>
+                                <strong>关键任务：</strong>直接领导并部署获取天津城防图。<br>
+								<strong>次要任务：</strong>向麦璇琨下达搜集并绘制城防图，组织康俊山（照相馆老板）将照片隐藏和赵岩（交通员）将照片送出的任务。<br>
+								<strong>关键作用：</strong>作为单线联系的上级是整条情报链的启动者和总指挥，确保了任务在极端危险的环境中得以周密执行。<br>
+                                <strong>后续：</strong>继续在天津市的建设或工业系统担任领导工作。
+                            </div>
+                        </div>
+                        <!-- 角色 4 ‌康俊山-->
+                        <div class="character-card">
+                            <div class="character-photo">
+                                <img src="https://i.imgs.ovh/2026/03/11/OFD7rc.jpeg" alt="OFD7rc.jpeg" border="0">
+                            </div>
+                            <div class="character-name">‌康俊山</div>
+                            <div class="character-bio">
+                                <strong>公开身份：</strong>大众照相馆经理，地下党员，技术精湛的摄影师，为人圆滑。<br>
+                                <strong>隐藏任务：</strong>1948年，受王文源，赵铁錞等人委托，将麦璇琨绘制的天津城防图分片拍成8张8寸照片，用升汞漂白后裱在老人遗像背面，由交通员赵岩安全送往华北局城工部泊镇，为解放天津提供了核心军事情报。<br>
+                                <strong>专属秘密：</strong>曾因家人被国民党扣押，一度动摇后坚定信仰。<br>
+                                <strong>后续：</strong>完成了多次地下缩印，传递图纸的任务，为天津解放立下重要功勋，是隐蔽战线的关键人物之一。
+                            </div>
+                        </div>
+                        <!-- 角色 5 赵岩-->
+                        <div class="character-card">
+                            <div class="character-photo">
+                                <img src="https://i.imgs.ovh/2026/03/11/OFeZyh.png" alt="金鉴">
+                            </div>
+                            <div class="character-name">赵岩</div>
+                            <div class="character-bio">
+                                <strong>公开身份：</strong>国民党工务局监工员，1947年入陆军大学乙级将官班学习。<br>
+                                <strong>专属秘密：</strong>嫉妒麦璇琨，渴望得到上司赏识。<br>
+                                <strong>关键任务：</strong>怀疑麦璇琨身份可疑，暗中调查。<br>
+                                <strong>后续：</strong>国民党败退，城防图失窃，天津解放。
+                            </div>
+                        </div>
+						<!-- 角色 6 -->
+                        <div class="character-card">
+                            <div class="character-photo">
+                                <img src="https://i.imgs.ovh/2026/03/11/OFeZyh.png" alt="金鉴">
+                            </div>
+                            <div class="character-name">金鉴</div>
+                            <div class="character-bio">
+                                <strong>公开身份：</strong>国民党工务局监工员，1947年入陆军大学乙级将官班学习。<br>
+                                <strong>专属秘密：</strong>嫉妒麦璇琨，渴望得到上司赏识。<br>
+                                <strong>关键任务：</strong>怀疑麦璇琨身份可疑，暗中调查。<br>
+                                <strong>后续：</strong>国民党败退，城防图失窃，天津解放。
+                            </div>
+                        </div>
+                        <!-- 角色 7 -->
+                        <div class="character-card">
+                            <div class="character-photo">
+                                <img src="https://i.imgs.ovh/2026/03/11/OFeZyh.png" alt="金鉴">
+                            </div>
+                            <div class="character-name">金鉴</div>
+                            <div class="character-bio">
+                                <strong>公开身份：</strong>国民党工务局监工员，1947年入陆军大学乙级将官班学习。<br>
+                                <strong>专属秘密：</strong>嫉妒麦璇琨，渴望得到上司赏识。<br>
+                                <strong>关键任务：</strong>怀疑麦璇琨身份可疑，暗中调查。<br>
+                                <strong>后续：</strong>国民党败退，城防图失窃，天津解放。
+                            </div>
+                        </div>
+                        <!-- 角色 8 -->
+                        <div class="character-card">
+                            <div class="character-photo">
+                                <img src="https://i.imgs.ovh/2026/03/11/OFeZyh.png" alt="金鉴">
+                            </div>
+                            <div class="character-name">金鉴</div>
+                            <div class="character-bio">
+                                <strong>公开身份：</strong>国民党工务局监工员，1947年入陆军大学乙级将官班学习。<br>
+                                <strong>专属秘密：</strong>嫉妒麦璇琨，渴望得到上司赏识。<br>
+                                <strong>关键任务：</strong>怀疑麦璇琨身份可疑，暗中调查。<br>
+                                <strong>后续：</strong>国民党败退，城防图失窃，天津解放。
+                            </div>
+                        </div>
+                    <div class="scroll-hint" style="margin-top: 1.5rem;">
+                        <span>👈 向左滑动返回介绍</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>© 2026 数字津门 · 天津城市文化数字档案  ·  津门剧史专页</p>
+            <p style="margin-top:0.4rem;">🏮 九河下梢 · 戏脉绵长 🏮</p>
+        </footer>
+    </div>
+
+    <script>
+        const scrollContainer = document.getElementById('horizontalScroll');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+
+        function updateButtons() {
+            if (!scrollContainer || !btnPrev || !btnNext) return;
+            
+            const scrollLeft = scrollContainer.scrollLeft;
+            const containerWidth = scrollContainer.clientWidth;
+            
+            // 第一屏: 显示右边的按钮
+            if (scrollLeft < containerWidth / 2) {
+                btnNext.classList.add('btn-visible');
+                btnPrev.classList.remove('btn-visible');
+            } 
+            // 第二屏: 显示左边的按钮
+            else {
+                btnPrev.classList.add('btn-visible');
+                btnNext.classList.remove('btn-visible');
+            }
+        }
+
+        // 初始化
+        updateButtons();
+
+        // 监听滚动
+        scrollContainer.addEventListener('scroll', updateButtons);
+
+        // 键盘支持
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                scrollContainer.scrollBy({left: -window.innerWidth, behavior: 'smooth'});
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                scrollContainer.scrollBy({left: window.innerWidth, behavior: 'smooth'});
+            } else if (e.key === 'Escape') {
+                closePopup();
+            }
+        });
+
+        window.addEventListener('resize', updateButtons);
+
+        // 弹出框控制 - 点击任意位置退出
+        function openPopup() {
+            document.getElementById('popupText').classList.add('show');
+            document.getElementById('popupExitArea').classList.add('show');
+        }
+
+        function closePopup() {
+            document.getElementById('popupText').classList.remove('show');
+            document.getElementById('popupExitArea').classList.remove('show');
+        }
+
+        // 阻止点击弹出框内部时关闭（避免点击内容时退出）
+        document.getElementById('popupText').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    </script>
+</body>
+</html>
