@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>津人物志 · 数字津门</title>
+    <style>
+        /* 全局统一样式 - 复用数字津门主风格 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background-color: #f5f3f0;
+            color: #1e2a3a;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        /* 头部导航 - 与首页/剧史页完全统一 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 2px solid #dcd7cd;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #b04b2b;
+            text-shadow: 2px 2px 0 #e1d6cc;
+        }
+        .logo span {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #5f6a7a;
+            letter-spacing: 2px;
+            margin-left: 0.5rem;
+        }
+        .nav ul {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        .nav a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #2f3e4f;
+            font-size: 1rem;
+            padding: 0.4rem 0;
+            border-bottom: 2px solid transparent;
+            transition: 0.2s;
+        }
+        .nav a:hover, .nav a.active {
+            border-bottom-color: #b04b2b;
+            color: #b04b2b;
+        }
+        /* 页面主标题 */
+        .page-hero {
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .page-hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #2c3a4b;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            border-bottom: 4px solid #b04b2b;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+        /* 板块标题 - 复用统一样式 */
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #1e2f3b;
+            margin: 3rem 0 1.5rem 0;
+            position: relative;
+            display: inline-block;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 70%;
+            height: 4px;
+            background: linear-gradient(90deg, #b04b2b, #d1b8a6);
+            border-radius: 4px;
+        }
+        /* 名人/文物通用卡片网格 */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0 4rem;
+        }
+        /* 卡片样式 - 复古圆角+阴影，hover动态 */
+        .info-card {
+            background: #fefcf7;
+            border-radius: 32px 16px 32px 16px;
+            box-shadow: 6px 6px 0 #cdbcac;
+            border: 1px solid #e1cfbf;
+            overflow: hidden;
+            transition: 0.2s all;
+        }
+        .info-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 10px 10px 0 #b04b2b60;
+        }
+        /* 卡片图片容器 - 4:3比例，统一视觉 */
+        .card-img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background-color: #d3cdc0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 4px solid #b04b2b;
+            overflow: hidden;
+        }
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: 0.3s scale;
+        }
+        .info-card:hover .card-img img {
+            scale: 1.05;
+        }
+        /* 卡片内容区 */
+        .card-content {
+            padding: 1.5rem;
+        }
+        .card-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4b3621;
+            margin-bottom: 0.8rem;
+            border-left: 5px solid #b04b2b;
+            padding-left: 0.8rem;
+        }
+        .card-content .label {
+            font-size: 0.9rem;
+            color: #5f6a7a;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .card-content p {
+            font-size: 1rem;
+            color: #2b3f4e;
+            line-height: 1.7;
+            text-align: justify;
+        }
+        /* 底部样式 - 统一数字津门风格 */
+        .footer {
+            text-align: center;
+            margin: 2rem 0 1rem;
+            padding: 1.5rem 0 0.5rem;
+            border-top: 1px solid #cdbcab;
+            color: #5f6b78;
+            font-size: 0.9rem;
+        }
+        /* 响应式适配 - 手机/平板优化 */
+        @media (max-width: 720px) {
+            .page-hero h1 {
+                font-size: 2rem;
+                letter-spacing: 4px;
+            }
+            .section-title {
+                font-size: 1.8rem;
+            }
+            .card-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .nav ul {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.5rem;
+            }
+            .card-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部导航 -->
+        <header class="header">
+            <div class="logo">数字津门 <span>· 故里寻踪</span></div>
+            <nav class="nav">
+                <ul>
+                    <li><a href=" ">首页</a></li>
+                    <li><a href="#">津门剧史</a></li>
+                    <li><a href="#" class="active">津人物志</a></li>
+                    <li><a href="#">史的造物</a></li>
+                    <li><a href="#">商城</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- 页面主标题 -->
+        <div class="page-hero">
+            <h1>津人物志</h1>
+        </div>
+
+        <!-- 津门名人板块 -->
+        <h2 class="section-title">津门名人</h2>
+        <div class="card-grid">
+            <!-- 张伯苓 -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/RTY5SQnS/IMG-20260405-002137.png" alt="张伯苓">
+                </div>
+                <div class="card-content">
+                    <h3>张伯苓</h3>
+                    <span class="label">1876—1951 | 近代著名教育家、南开创始人</span>
+                    <p>毕业于北洋水师学堂，甲午战败后立志教育救国。1904年创办南开中学，1919年创立南开大学，构建完整南开教育体系，倡导"公能"教育，重视体育，被誉为"中国奥运第一人"。</p>
+                </div>
+            </div>
+            <!-- 严修 -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/0RHsCRf8/IMG-20260405-002111.png" alt="严修">
+                </div>
+                <div class="card-content">
+                    <h3>严修</h3>
+                    <span class="label">1860—1929 | 近代教育家、书法家、南开校父</span>
+                    <p>晚清进士，曾任贵州学政，主张废除科举、兴办新学。与张伯苓携手创办南开系列学校，捐资兴学，主持城南诗社。书法造诣深厚，为天津四大名写家之一，传承津沽文脉。</p>
+                </div>
+            </div>
+            <!-- 霍元甲 -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/RkvyzR4J/Screenshot-2026-0405-001516.png" alt="霍元甲">
+                </div>
+                <div class="card-content">
+                    <h3>霍元甲</h3>
+                    <span class="label">1868—1910 | 爱国武术家、迷踪拳大师</span>
+                    <p>天津静海人，自幼习武融合多家拳法创"迷踪艺"。1909年在津击败俄国大力士，慑服英国大力士奥皮音。1910年在上海创办精武体育会，孙中山题词"尚武精神"，弘扬强国强民理念。</p>
+                </div>
+            </div>
+            <!-- 李叔同 -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/8L14C5wY/Screenshot-2026-0405-001623.png" alt="李叔同">
+                </div>
+                <div class="card-content">
+                    <h3>李叔同</h3>
+                    <span class="label">1880—1942 | 新文化先驱、话剧奠基人、弘一法师</span>
+                    <p>通书画、篆刻、音乐、戏剧，在日本创立春柳社演出《茶花女》，开启中国话剧史。创作《送别》传唱百年，后出家为僧，精研律宗，成为一代高僧，集多重艺术与宗教成就于一身。</p>
+                </div>
+            </div>
+            <!-- 梁启超 -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/RTC3cyf7/IMG-20260405-002156.png" alt="梁启超">
+                </div>
+                <div class="card-content">
+                    <h3>梁启超</h3>
+                    <span class="label">1873—1929 | 近代思想家、学者</span>
+                    <p>戊戌变法领袖之一，1912年定居天津意租界并建"饮冰室"书斋。在此完成《清代学术概论》《中国近三百年学术史》等经典著作，结集为《饮冰室合集》，今饮冰室为梁启超纪念馆。</p>
+                </div>
+            </div>
+            <!-- 马三立 -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/VYfZBzmk/Screenshot-2026-0405-001643.png" alt="马三立">
+                </div>
+                <div class="card-content">
+                    <h3>马三立</h3>
+                    <span class="label">1914—2003 | 相声泰斗</span>
+                    <p>"相声八德"之后第三代领军人物，擅演文哏，风格平实幽默、回味无穷。代表作《逗你玩》《买猴》《十点钟开始》，将相声从市井艺术提升至文化高度，奠定天津相声重镇地位。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 津沽文物板块 -->
+        <h2 class="section-title">津沽文物</h2>
+        <div class="card-grid">
+            <!-- 清乾隆款珐琅彩芍药雉鸡纹玉壶春瓶 -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/xKYHsNCY/IMG-20260404-235337.png" alt="珐琅彩芍药雉鸡纹玉壶春瓶">
+                </div>
+                <div class="card-content">
+                    <h3>珐琅彩芍药雉鸡纹玉壶春瓶</h3>
+                    <span class="label">清乾隆 | 天津博物馆镇馆之宝、举世孤品</span>
+                    <p>高16.3厘米，瓶身绘芍药、雉鸡并配题诗，集诗书画印于一体，代表珐琅彩工艺巅峰水准，色彩艳丽、画工精细，为清代官窑瓷器极品。</p>
+                </div>
+            </div>
+            <!-- 东汉鲜于璜碑 -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/cj84cYx/IMG-20260404-235239.png" alt="鲜于璜碑">
+                </div>
+                <div class="card-content">
+                    <h3>东汉鲜于璜碑</h3>
+                    <span class="label">东汉延熹八年（165年） | 天津最早有姓名的历史人物墓碑</span>
+                    <p>天津武清出土，碑文字体为汉代隶书极品，方笔雄健，被誉为"方笔之冠"，兼具极高的书法艺术价值与天津地方历史研究价值。</p>
+                </div>
+            </div>
+            <!-- 隋白釉龙柄联腹传瓶 -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/BHwwy5MJ/IMG-20260404-235217.png" alt="白釉龙柄联腹传瓶">
+                </div>
+                <div class="card-content">
+                    <h3>白釉龙柄联腹传瓶</h3>
+                    <span class="label">隋代 | 国家一级文物、隋代白瓷最高成就</span>
+                    <p>造型独特，双腹相连、龙形柄装饰，白釉纯净莹润，见证了隋代北方陶瓷烧制技术的重大突破，为隋代白瓷的经典代表作。</p>
+                </div>
+            </div>
+            <!-- 西周太保鼎 -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/ycWDNXSf/IMG-20260404-235201.png" alt="太保鼎">
+                </div>
+                <div class="card-content">
+                    <h3>西周太保鼎</h3>
+                    <span class="label">西周早期 | 禁止出国展览文物、青铜重器</span>
+                    <p>通高57.6厘米，四柱足造型，纹饰精美，铸有"太保"铭文，为周初召公相关器物，工艺精湛，是研究西周早期历史的重要青铜文物。</p>
+                </div>
+            </div>
+            <!-- 清代大龙邮票 -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/kV83xWr2/IMG-20260404-235138.png" alt="大龙邮票">
+                </div>
+                <div class="card-content">
+                    <h3>清代大龙邮票</h3>
+                    <span class="label">清光绪四年（1878年） | 中国第一套官方邮票</span>
+                    <p>天津海关首发，分三分银、五分银、一钱银三种，图案为蟠龙纹，拉开了中国邮政史的序幕，是收藏界极具价值的珍品。</p>
+                </div>
+            </div>
+            <!-- 王羲之《寒切帖》（唐摹本） -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/hR4jHj61/Screenshot-2026-0404-234327.png" alt="寒切帖">
+                </div>
+                <div class="card-content">
+                    <h3>王羲之《寒切帖》（唐摹本）</h3>
+                    <span class="label">唐代 | 书法史上稀世珍品</span>
+                    <p>纵26厘米，横21.5厘米，为王羲之草书唐摹精品，笔墨流畅、神韵毕现，近乎真迹，是天津博物馆藏书法类文物的代表，具有极高的艺术价值。</p>
+                </div>
+            </div>
+            <!-- 新增：元代十四仓瓷狮子 -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/7xh8H3kq/IMG-20260404-235121.png" alt="元代十四仓瓷狮子">
+                </div>
+                <div class="card-content">
+                    <h3>元代十四仓瓷狮子</h3>
+                    <span class="label">元代 | 天津河西务十四仓遗址出土</span>
+                    <p>影青釉瓷狮，造型憨态可掬，见证元代天津漕运繁华，是元代陶瓷与漕运文化的重要物证，反映了天津在元代作为重要漕运枢纽的历史地位。</p>
+                </div>
+            </div>
+                        <!-- 新增：清代大沽铁钟 -->
+            <div class="info-card">
+                <div class="card-img">
+                    <img src="https://i.ibb.co/tTkNqbSk/IMG-20260404-235109.png" alt="清代大沽铁钟">
+                </div>
+                <div class="card-content">
+                    <h3>清代大沽铁钟</h3>
+                    <span class="label">清光绪十年（1884年） | 大沽口炮台文物</span>
+                    <p>原大沽口炮台文物，见证近代海防历史。钟身铸铭文，曾流失海外，2005年回归，是中国反侵略历史与文物回归的重要象征，体现了中华民族不屈不挠的精神。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部 -->
+        <footer class="footer">
+            <p>© 2026 数字津门 · 天津城市文化数字档案 · 津人物志专页</p>
+            <p style="margin-top:0.4rem;">🏮 人杰地灵 · 津沽文脉 🏮</p>
+        </footer>
+    </div>
+</body>
+</html>
