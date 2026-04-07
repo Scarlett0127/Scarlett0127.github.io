@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>数字津门 · 文创商城 </title>
+    <style>
+        /* ----- 全局样式 暖棕色调 + 圆润津门风味 ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background-color: #f8f5f0;
+            color: #2c2a27;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        /* ----- 头部导航 致敬津门老字号气质 ----- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 0;
+            border-bottom: 2px solid #e2d6cb;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo {
+            font-size: 1.9rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: #b34e2c;
+            text-shadow: 2px 2px 0 #f0e4d6;
+        }
+        .logo span {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: #6f5e4e;
+            letter-spacing: 1px;
+            margin-left: 0.5rem;
+        }
+        .nav ul {
+            display: flex;
+            gap: 1.8rem;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        .nav a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #4a3a2c;
+            font-size: 1rem;
+            padding: 0.3rem 0;
+            border-bottom: 2px solid transparent;
+            transition: 0.2s;
+        }
+        .nav a:hover,
+        .nav a.active {
+            border-bottom-color: #b34e2c;
+            color: #b34e2c;
+        }
+        .cart-icon {
+            position: relative;
+            font-size: 1.6rem;
+            color: #b34e2c;
+            cursor: pointer;
+            padding: 0.3rem 0.3rem 0 0.3rem;
+            transition: 0.2s;
+        }
+        .cart-icon:hover {
+            transform: scale(1.02);
+        }
+        .cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            background-color: #e4583b;
+            color: white;
+            font-size: 0.68rem;
+            font-weight: bold;
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        /* 筛选区 */
+        .filter-section {
+            margin: 2rem 0 1.5rem;
+        }
+        .filter-tags {
+            display: flex;
+            gap: 0.9rem;
+            flex-wrap: wrap;
+        }
+        .filter-tag {
+            padding: 0.5rem 1.3rem;
+            background-color: #ffffffdd;
+            backdrop-filter: blur(2px);
+            border: 1px solid #e2cfbe;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #4f3b2c;
+            box-shadow: 2px 2px 0 #d9caba;
+        }
+        .filter-tag.active {
+            background-color: #b34e2c;
+            color: white;
+            border-color: #b34e2c;
+            box-shadow: 3px 3px 0 #8f3a1e;
+        }
+        /* 商品网格 */
+        .goods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        /* 卡片样式 天津老城厢韵味 */
+        .goods-card {
+            background: #fffdf9;
+            border-radius: 36px 16px 36px 16px;
+            overflow: hidden;
+            box-shadow: 6px 6px 0 #cebba8;
+            border: 1px solid #eedbcb;
+            transition: 0.2s;
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+        .goods-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 12px 12px 0 #b34e2c60;
+        }
+        /* 商品图片容器：适配img标签，4:3比例，居中裁剪 */
+        .goods-img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #dfcdbb;
+            border-bottom: 4px solid #b34e2c;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 10% 30%, rgba(255,245,235,0.6) 2%, transparent 2.5%);
+            background-size: 18px 18px;
+        }
+        .goods-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        .goods-info {
+            padding: 1.2rem 1rem 1.2rem 1rem;
+        }
+        .goods-name {
+            font-size: 0.98rem;
+            font-weight: 600;
+            color: #2c241c;
+            margin-bottom: 0.5rem;
+            line-height: 1.35;
+            min-height: 48px;
+        }
+        .designer-meta {
+            font-size: 0.7rem;
+            color: #b77b5a;
+            background: #fef2ea;
+            display: inline-block;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            margin-bottom: 0.6rem;
+            letter-spacing: 0.3px;
+        }
+        .goods-price {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #b34e2c;
+            margin: 0.6rem 0 1rem;
+        }
+        .add-cart-btn {
+            width: 100%;
+            padding: 0.7rem;
+            background-color: #b34e2c;
+            color: white;
+            border: none;
+            border-radius: 24px 8px 24px 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s linear;
+            font-size: 0.9rem;
+            box-shadow: 2px 2px 0 #8f3a1e;
+        }
+        .add-cart-btn:hover {
+            background-color: #8f3a1e;
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 #6e2e16;
+        }
+        /* 购物车侧边栏 */
+        .cart-modal {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 380px;
+            max-width: 92vw;
+            height: 100vh;
+            background: #fffbf5;
+            box-shadow: -8px 0 20px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            z-index: 1001;
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-modal.active {
+            transform: translateX(0);
+        }
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #eedbcb;
+        }
+        .cart-header h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2f2a24;
+            letter-spacing: 1px;
+        }
+        .cart-close {
+            font-size: 2rem;
+            line-height: 1;
+            color: #a77c5e;
+            cursor: pointer;
+            width: 32px;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .cart-close:hover {
+            color: #b34e2c;
+        }
+        .cart-list {
+            flex: 1;
+            margin-bottom: 1.5rem;
+        }
+        .cart-item {
+            display: flex;
+            gap: 0.9rem;
+            padding: 0.9rem 0;
+            border-bottom: 1px solid #f0e2d6;
+            align-items: center;
+        }
+        /* 购物车商品图片 */
+        .cart-item-img {
+            width: 54px;
+            height: 54px;
+            background: #decbb8;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .cart-item-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        .cart-item-info {
+            flex: 1;
+        }
+        .cart-item-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #2f2a24;
+            margin-bottom: 0.3rem;
+        }
+        .cart-item-name a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .cart-item-price {
+            font-weight: 600;
+            color: #b34e2c;
+            font-size: 0.85rem;
+        }
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 6px;
+        }
+        .cart-qty-btn {
+            background: #f0e4d8;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #5a3f2e;
+            transition: 0.1s;
+        }
+        .cart-qty-btn:hover {
+            background: #e2cfbe;
+        }
+        .cart-item-qty {
+            font-size: 0.9rem;
+            font-weight: 500;
+            min-width: 24px;
+            text-align: center;
+        }
+        .remove-item {
+            background: none;
+            border: none;
+            color: #bf8870;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-left: 0.4rem;
+            padding: 0 4px;
+        }
+        .remove-item:hover {
+            color: #b34e2c;
+        }
+        .cart-total {
+            padding-top: 1rem;
+            border-top: 3px double #e2d6cb;
+            margin-bottom: 1.2rem;
+        }
+        .cart-total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .cart-total-row.total {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #b34e2c;
+            margin-top: 0.5rem;
+        }
+        .checkout-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: #b34e2c;
+            color: white;
+            border: none;
+            border-radius: 32px 12px 32px 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 #8f3a1e;
+            transition: 0.2s;
+        }
+        .checkout-btn:hover {
+            background: #8f3a1e;
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 #6e2e16;
+        }
+        /* 空购物车提示 */
+        .empty-cart {
+            text-align: center;
+            padding: 4rem 0;
+            color: #9a8068;
+        }
+        .empty-cart i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .empty-cart p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        /* 遮罩层 */
+        .mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.25);
+            backdrop-filter: blur(2px);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .mask.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .nav ul {
+                gap: 1.2rem;
+            }
+            .goods-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 1.5rem;
+            }
+            .designer-banner p {
+                font-size: 0.9rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .header {
+                padding: 1rem 0;
+            }
+            .logo {
+                font-size: 1.6rem;
+            }
+            .nav ul {
+                gap: 0.8rem;
+                font-size: 0.9rem;
+            }
+            .goods-grid {
+                grid-template-columns: 1fr;
+            }
+            .filter-tag {
+                padding: 0.4rem 1rem;
+                font-size: 0.85rem;
+            }
+            .cart-modal {
+                padding: 1.2rem 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mask" id="mask"></div>
+    <div class="container">
+        <!-- 头部导航：首页、津门剧史、津人物志、史的造物、商城 -->
+        <header class="header">
+            <div class="logo">数字津门 <span>· 故里寻踪</span></div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="#">首页</a></li>
+                    <li><a href="#">津门剧史</a></li>
+                    <li><a href="#">津人物志</a></li>
+                    <li><a href="#">史的造物</a></li>
+                    <li><a href="#" class="active">商城</a></li>
+                </ul>
+            </nav>
+            <div class="cart-icon" id="cartIcon">
+                🛒
+                <span class="cart-badge" id="cartBadge">0</span>
+            </div>
+        </header>
+        <!-- 设计师联名横幅 -->
+        <div class="designer-banner">
+            <p><strong>津门剧史联名文创</strong> 限量发售</p>
+        </div>
+        <!-- 商品筛选区 -->
+        <section class="filter-section">
+            <div class="filter-tags">
+                <div class="filter-tag active" data-type="all">全部商品</div>
+                <div class="filter-tag" data-type="canvas">帆布包/托特包</div>
+                <div class="filter-tag" data-type="plush">毛绒玩具/公仔</div>
+                <div class="filter-tag" data-type="bag">主题小背包</div>
+            </div>
+        </section>
+        <!-- 商品列表区 -->
+        <section class="goods-grid" id="goodsGrid">
+            <!-- 商品由JS动态生成，含所有新增款式 -->
+        </section>
+    </div>
+    <!-- 购物车弹窗 -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-header">
+            <h3>我的购物车</h3>
+            <div class="cart-close" id="cartClose">×</div>
+        </div>
+        <div class="cart-list" id="cartList">
+            <div class="empty-cart">
+                <i>🛒</i>
+                <p>购物车还是空的哦<br>快去挑选心仪的文创吧</p>
+            </div>
+        </div>
+        <div class="cart-total" id="cartTotal">
+            <div class="cart-total-row">
+                <span>商品总价</span>
+                <span id="subTotal">¥0.00</span>
+            </div>
+            <div class="cart-total-row">
+                <span>运费</span>
+                <span>¥0.00</span>
+            </div>
+            <div class="cart-total-row total">
+                <span>实付款</span>
+                <span id="payTotal">¥0.00</span>
+            </div>
+        </div>
+        <button class="checkout-btn">去结算</button>
+    </div>
+    <script>
+        // ********** 完整商品数据：含图片/链接，替换为实际地址即可 **********
+        const goodsList = [
+            // 帆布包/托特包 (canvas) - 替换imgUrl为实际图片地址
+            { id: 1, name: "公仔帆布包可爱学生书包可爱包包萌包", price: 15.99, type: "canvas", url: "https://digitaljinmen.com/goods/canvas1.html", imgUrl: "https://i.ibb.co/Zn8XV0h/IMG-20260406-182947.png" },
+            { id: 2, name: "软萌骑行公仔帆布包可爱学生通勤包可爱包包萌包", price: 15.99, type: "canvas", url: "https://digitaljinmen.com/goods/canvas2.html", imgUrl: "https://i.ibb.co/Kjx66pjt/mmexport1775465589260.jpg" },
+            { id: 3, name: "通勤风公仔托特包可爱学生书包可爱包包萌包", price: 13.99, type: "canvas", url: "https://digitaljinmen.com/goods/canvas3.html", imgUrl: "https://i.ibb.co/wZKQNcMY/mmexport1775465590604.jpg" },
+            { id: 4, name: "萌趣工程员托特包可爱学生书包可爱包包萌包", price: 17.99, type: "canvas", url: "https://digitaljinmen.com/goods/canvas4.html", imgUrl: "https://i.ibb.co/yF6qgf3f/IMG-20260406-181848.png" },
+            { id: 5, name: "清新信封帆布包可爱学生上课包可爱包包萌包", price: 15.99, type: "canvas", url: "https://digitaljinmen.com/goods/canvas5.html", imgUrl: "https://i.ibb.co/RmDGN6P/IMG-20260406-182033.png" },
+            { id: 6, name: "实验室主题帆布包可爱学生上课包可爱包包萌包", price: 15.99, type: "canvas", url: "https://digitaljinmen.com/goods/canvas6.html", imgUrl: "https://i.ibb.co/Pvfsvg37/IMG-20260406-182041.png" },
+            { id: 7, name: "软萌摄影师帆布包可爱学生通勤包可爱包包萌包", price: 15.99, type: "canvas", url: "https://digitaljinmen.com/goods/canvas7.html", imgUrl: "https://i.ibb.co/Zp9jw8BL/mmexport1775465595669.jpg" },
+            { id: 8, name: "绘图主题帆布托特包可爱学生画包可爱包包萌包", price: 15.99, type: "canvas", url: "https://digitaljinmen.com/goods/canvas8.html", imgUrl: "https://i.ibb.co/Ld3VsVxc/mmexport1775465596867.jpg" },
+            { id: 9, name: "军装主题公仔帆布包可爱学生通勤包可爱包包萌包", price: 15.99, type: "canvas", url: "https://digitaljinmen.com/goods/canvas9.html", imgUrl: "https://i.ibb.co/TxRWvcx1/mmexport1775465270515.jpg" },
+
+            // 毛绒玩具/公仔 (plush) - 替换imgUrl为实际图片地址
+            { id: 10, name: "软萌骑行公仔毛绒玩具可爱学生玩偶可爱娃娃萌娃", price: 15.99, type: "plush", url: "https://digitaljinmen.com/goods/plush10.html", imgUrl: "https://i.ibb.co/7hdzcyX/mmexport1775465598057.jpg" },
+            { id: 11, name: "绘图主题毛绒公仔可爱小学生玩偶软萌娃娃萌娃", price: 15.99, type: "plush", url: "https://digitaljinmen.com/goods/plush11.html", imgUrl: "https://i.ibb.co/s9ZGvWJg/mmexport1775465265148.jpg" },
+            { id: 12, name: "相机主题毛绒玩偶可爱小学生玩偶软萌娃娃萌娃", price: 15.99, type: "plush", url: "https://digitaljinmen.com/goods/plush12.html", imgUrl: "https://i.ibb.co/cSd0MpsZ/mmexport1775465268263.jpg" },
+            { id: 13, name: "公仔毛绒玩具可爱小学生玩偶金鉴版可爱娃娃萌娃", price: 15.99, type: "plush", url: "https://digitaljinmen.com/goods/plush13.html", imgUrl: "https://i.ibb.co/yFXh2xwN/mmexport1775465277969.jpg" },
+            { id: 15, name: "可爱萌娃小学生玩具网红款超励志娃娃", price: 20.55, type: "plush", url: "https://digitaljinmen.com/goods/plush15.html", imgUrl: "https://i.ibb.co/dw0MfsPt/mmexport1775465279431.jpg" },
+            { id: 16, name: "可爱萌娃小学生玩具网红款超励志娃娃", price: 20.55, type: "plush", url: "https://digitaljinmen.com/goods/plush16.html", imgUrl: "https://i.ibb.co/tFBXpdh/mmexport1775465281056.jpg" },
+            { id: 17, name: "可爱萌娃小学生玩具网红款超励志娃娃", price: 20.55, type: "plush", url: "https://digitaljinmen.com/goods/plush17.html", imgUrl: "https://i.ibb.co/CKQh9bMx/mmexport1775465282744.jpg" },
+            { id: 18, name: "陈长捷可爱毛绒玩具公仔娃娃小学生网红励志款", price: 25.99, type: "plush", url: "https://digitaljinmen.com/goods/plush18.html", imgUrl: "https://i.ibb.co/8n2h4b84/mmexport1775465286030.jpg" },
+
+            // 主题小背包 (bag) - 替换imgUrl为实际图片地址
+            { id: 19, name: "陈长捷网红励志款小背包", price: 25.99, type: "bag", url: "https://digitaljinmen.com/goods/bag19.html", imgUrl: "https://i.ibb.co/234GQVSB/mmexport1775465284335.jpg" }
+        ];
+
+        // 购物车数据
+        let cart = JSON.parse(localStorage.getItem('digitalJinmenCart')) || [];
+        // DOM元素
+        const goodsGrid = document.getElementById('goodsGrid');
+        const filterTags = document.querySelectorAll('.filter-tag');
+        const cartIcon = document.getElementById('cartIcon');
+        const cartModal = document.getElementById('cartModal');
+        const cartClose = document.getElementById('cartClose');
+        const mask = document.getElementById('mask');
+        const cartList = document.getElementById('cartList');
+        const cartBadge = document.getElementById('cartBadge');
+        const subTotal = document.getElementById('subTotal');
+        const payTotal = document.getElementById('payTotal');
+
+        // 初始化
+        renderGoods(goodsList);
+        updateCart();
+        bindFilterEvent();
+        bindCartModalEvent();
+
+        // 渲染商品列表（含图片+链接，懒加载+失败兜底）
+        function renderGoods(list) {
+            goodsGrid.innerHTML = '';
+            list.forEach(goods => {
+                const card = document.createElement('a');
+                card.className = 'goods-card';
+                card.href = goods.url;
+                card.target = '_blank';
+                card.innerHTML = `
+                    <div class="goods-img">
+                        <img src="${goods.imgUrl}" loading="lazy" alt="${goods.name}" onerror="this.src='default.png'">
+                    </div>
+                    <div class="goods-info">
+                        <p class="goods-name">${goods.name}</p>
+                        <span class="designer-meta">津门剧史联名</span>
+                        <p class="goods-price">¥${goods.price.toFixed(2)}</p>
+                        <button class="add-cart-btn" data-id="${goods.id}">加入购物车</button>
+                    </div>
+                `;
+                goodsGrid.appendChild(card);
+            });
+            // 绑定加入购物车事件（阻止按钮跳转）
+            document.querySelectorAll('.add-cart-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const goodsId = parseInt(this.getAttribute('data-id'));
+                    addToCart(goodsId);
+                    this.innerText = '已加入 ✔';
+                    setTimeout(() => this.innerText = '加入购物车', 1000);
+                });
+            });
+        }
+
+        // 商品筛选
+        function bindFilterEvent() {
+            filterTags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    filterTags.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    const type = this.getAttribute('data-type');
+                    const filteredList = type === 'all' 
+                        ? goodsList 
+                        : goodsList.filter(g => g.type === type);
+                    renderGoods(filteredList);
+                });
+            });
+        }
+
+        // 加入购物车
+        function addToCart(goodsId) {
+            const goods = goodsList.find(g => g.id === goodsId);
+            if (!goods) return;
+            const existItem = cart.find(item => item.id === goodsId);
+            if (existItem) {
+                existItem.count++;
+            } else {
+                cart.push({ ...goods, count: 1 });
+            }
+            updateCart();
+            saveCart();
+        }
+
+        // 更新购物车（含商品图片+名称链接）
+        function updateCart() {
+            // 更新角标
+            cartBadge.innerText = cart.reduce((total, item) => total + item.count, 0);
+            // 渲染购物车列表
+            if (cart.length === 0) {
+                cartList.innerHTML = `
+                    <div class="empty-cart">
+                        <i>🛒</i>
+                        <p>购物车还是空的哦<br>快去挑选心仪的文创吧</p>
+                    </div>
+                `;
+                subTotal.innerText = '¥0.00';
+                payTotal.innerText = '¥0.00';
+                return;
+            }
+            // 有商品时渲染
+            cartList.innerHTML = '';
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = item.price * item.count;
+                total += itemTotal;
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-img">
+                        <img src="${item.imgUrl}" alt="${item.name}" onerror="this.src='default-small.png'">
+                    </div>
+                    <div class="cart-item-info">
+                        <p class="cart-item-name"><a href="${item.url}" target="_blank">${item.name}</a></p>
+                        <p class="cart-item-price">¥${item.price.toFixed(2)}</p>
+                        <div class="cart-item-actions">
+                            <button class="cart-qty-btn minus" data-id="${item.id}">-</button>
+                            <span class="cart-item-qty">${item.count}</span>
+                            <button class="cart-qty-btn plus" data-id="${item.id}">+</button>
+                            <button class="remove-item" data-id="${item.id}">×</button>
+                        </div>
+                    </div>
+                `;
+                cartList.appendChild(cartItem);
+            });
+            // 更新价格
+            subTotal.innerText = `¥${total.toFixed(2)}`;
+            payTotal.innerText = `¥${total.toFixed(2)}`;
+            // 绑定购物车操作事件
+            bindCartActionEvent();
+        }
+
+        // 购物车操作：增减数量、删除
+        function bindCartActionEvent() {
+            // 增加数量
+            document.querySelectorAll('.cart-qty-btn.plus').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = parseInt(btn.getAttribute('data-id'));
+                    cart.find(item => item.id === id).count++;
+                    updateCart();
+                    saveCart();
+                });
+            });
+            // 减少数量
+            document.querySelectorAll('.cart-qty-btn.minus').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = parseInt(btn.getAttribute('data-id'));
+                    const item = cart.find(item => item.id === id);
+                    if (item.count > 1) {
+                        item.count--;
+                    } else {
+                        cart = cart.filter(i => i.id !== id);
+                    }
+                    updateCart();
+                    saveCart();
+                });
+            });
+            // 删除商品
+            document.querySelectorAll('.remove-item').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = parseInt(btn.getAttribute('data-id'));
+                    cart = cart.filter(item => item.id !== id);
+                    updateCart();
+                    saveCart();
+                });
+            });
+        }
+
+        // 保存购物车到本地存储
+        function saveCart() {
+            localStorage.setItem('digitalJinmenCart', JSON.stringify(cart));
+        }
+
+        // 购物车弹窗开关
+        function bindCartModalEvent() {
+            // 打开
+            cartIcon.addEventListener('click', () => {
+                cartModal.classList.add('active');
+                mask.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            // 关闭
+            function closeCart() {
+                cartModal.classList.remove('active');
+                mask.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+            cartClose.addEventListener('click', closeCart);
+            mask.addEventListener('click', closeCart);
+            // 键盘ESC关闭
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && cartModal.classList.contains('active')) {
+                    closeCart();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
